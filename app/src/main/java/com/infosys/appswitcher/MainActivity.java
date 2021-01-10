@@ -37,34 +37,6 @@ public class MainActivity extends AppCompatActivity implements SerialInputOutput
             startActivity(intent);
         }
         startService();
-//        UsbManager manager = (UsbManager) getApplicationContext().getSystemService(Context.USB_SERVICE);
-//        List<UsbSerialDriver> availableDrivers = UsbSerialProber.getDefaultProber().findAllDrivers(manager);
-//        if (availableDrivers.isEmpty()) {
-//            Toast.makeText(this, "No devices found", Toast.LENGTH_SHORT).show();
-//            return;
-//        } else {
-//            Toast.makeText(this, "Devices Found", Toast.LENGTH_SHORT).show();
-//            UsbSerialDriver driver = availableDrivers.get(0);
-//            UsbDeviceConnection connection = manager.openDevice(driver.getDevice());
-//            PendingIntent usbPermissionIntent = PendingIntent.getBroadcast(getApplicationContext(), 0, new Intent(INTENT_ACTION_GRANT_USB), 0);
-//            manager.requestPermission(driver.getDevice(), usbPermissionIntent);
-//            if (connection == null) {
-//                // add UsbManager.requestPermission(driver.getDevice(), ..) handling here
-//                Toast.makeText(this, "Cannot open device connection", Toast.LENGTH_SHORT).show();
-//                return;
-//            }
-//
-//            UsbSerialPort port = driver.getPorts().get(0); // Most devices have just one port (port 0)
-//            try {
-//                port.open(connection);
-//                port.setParameters(115200, 8, UsbSerialPort.STOPBITS_1, UsbSerialPort.PARITY_NONE);
-//                Toast.makeText(this, "Connection Open!", Toast.LENGTH_SHORT).show();
-//                SerialInputOutputManager usbIoManager = new SerialInputOutputManager(port, this);
-//                //Executors.newSingleThreadExecutor().submit(usbIoManager);
-//            } catch (Exception e) {
-//                Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
-//            }
-//        }
     }
 
     @Override

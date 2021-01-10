@@ -16,6 +16,7 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
+import android.util.Log;
 import android.widget.Toast;
 
 import androidx.core.app.NotificationCompat;
@@ -34,6 +35,8 @@ import java.util.concurrent.Executors;
 public class ForegroundService extends Service implements SerialInputOutputManager.Listener {
     public static final String CHANNEL_ID = "ForegroundServiceChannel";
     private static final String INTENT_ACTION_GRANT_USB = BuildConfig.APPLICATION_ID + ".GRANT_USB";
+    private int position = 0;
+    private String[] appList = {"com.whatsapp", "com.oneplus.gallery", "com.android.dialer"};
 
     public ForegroundService() {
     }
@@ -110,23 +113,38 @@ public class ForegroundService extends Service implements SerialInputOutputManag
     @Override
     public void onNewData(byte[] data) {
         String str = new String(data, StandardCharsets.UTF_8);
-        String topPakage = getTopPackage();
-        new Handler(Looper.getMainLooper()).post(new Runnable() {
-            public void run() {
-                Toast.makeText(getApplicationContext(), topPakage, Toast.LENGTH_SHORT).show();
-            }
-        });
+//        String topPakage = getTopPackage();
+//        new Handler(Looper.getMainLooper()).post(new Runnable() {
+//            public void run() {
+//                Toast.makeText(getApplicationContext(), topPakage, Toast.LENGTH_SHORT).show();
+//            }
+//        });
+        Log.d("positiontag", String.valueOf(position));
+        Intent launchIntent = getPackageManager().getLaunchIntentForPackage(appList[position]);//.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_LAUNCHED_FROM_HISTORY);
+        launchIntent.setFlags(launchIntent.FLAG_ACTIVITY_LAUNCHED_FROM_HISTORY | launchIntent.FLAG_ACTIVITY_NEW_TASK );
+        if(null==launchIntent) {
+            Log.d("positiontag", "Null hai bhaiya");
+        }
+        position++;
+        if(position>2) {
+            position=0;
+        }
+        startActivity(launchIntent);
+
     }
 
     String getTopPackage(){
         long ts = System.currentTimeMillis();
         UsageStatsManager mUsageStatsManager = (UsageStatsManager)getSystemService(Context.USAGE_STATS_SERVICE);
-        List<UsageStats> usageStats = mUsageStatsManager.queryUsageStats(UsageStatsManager.INTERVAL_BEST, ts-1000, ts);
+        List<UsageStats> usageStats = mUsageStatsManager.queryUsageStats(UsageStatsManager.INTERVAL_DAILY, ts-10000, ts);
+
         if (usageStats == null || usageStats.size() == 0) {
             return "NONE_PKG";
+        } else {
+            Log.d(usageStats.toString(), "applist");
+            Collections.sort(usageStats, new RecentUseComparator());
+            return usageStats.get(0).getPackageName();
         }
-        Collections.sort(usageStats, new RecentUseComparator());
-        return usageStats.get(0).getPackageName();
     }
 
     static class RecentUseComparator implements Comparator<UsageStats> {
