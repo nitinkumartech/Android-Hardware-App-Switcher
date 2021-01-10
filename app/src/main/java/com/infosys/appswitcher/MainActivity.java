@@ -36,6 +36,8 @@ public class MainActivity extends AppCompatActivity implements SerialInputOutput
             Intent intent = new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS);
             startActivity(intent);
         }
+        Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION);
+        startActivity(intent);
         startService();
     }
 

@@ -45,6 +45,7 @@ public class ForegroundService extends Service implements SerialInputOutputManag
     public void onCreate() {
         super.onCreate();
     }
+
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         String input = intent.getStringExtra("inputExtra");
@@ -113,30 +114,32 @@ public class ForegroundService extends Service implements SerialInputOutputManag
     @Override
     public void onNewData(byte[] data) {
         String str = new String(data, StandardCharsets.UTF_8);
-//        String topPakage = getTopPackage();
-//        new Handler(Looper.getMainLooper()).post(new Runnable() {
-//            public void run() {
-//                Toast.makeText(getApplicationContext(), topPakage, Toast.LENGTH_SHORT).show();
-//            }
-//        });
-        Log.d("positiontag", String.valueOf(position));
-        Intent launchIntent = getPackageManager().getLaunchIntentForPackage(appList[position]);//.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_LAUNCHED_FROM_HISTORY);
-        launchIntent.setFlags(launchIntent.FLAG_ACTIVITY_LAUNCHED_FROM_HISTORY | launchIntent.FLAG_ACTIVITY_NEW_TASK );
-        if(null==launchIntent) {
-            Log.d("positiontag", "Null hai bhaiya");
+        if (str.equals("prev")) {
+            if (position == 0) {
+                position = 2;
+            } else {
+                position--;
+            }
+            Intent launchIntent = getPackageManager().getLaunchIntentForPackage(appList[position]);//.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+            launchIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+            getBaseContext().startActivity(launchIntent);
         }
-        position++;
-        if(position>2) {
-            position=0;
+        if (str.equals("next")) {
+            if (position == 2) {
+                position = 0;
+            } else {
+                position++;
+            }
+            Intent launchIntent = getPackageManager().getLaunchIntentForPackage(appList[position]);//.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+            launchIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+            getBaseContext().startActivity(launchIntent);
         }
-        startActivity(launchIntent);
-
     }
 
-    String getTopPackage(){
+    String getTopPackage() {
         long ts = System.currentTimeMillis();
-        UsageStatsManager mUsageStatsManager = (UsageStatsManager)getSystemService(Context.USAGE_STATS_SERVICE);
-        List<UsageStats> usageStats = mUsageStatsManager.queryUsageStats(UsageStatsManager.INTERVAL_DAILY, ts-10000, ts);
+        UsageStatsManager mUsageStatsManager = (UsageStatsManager) getSystemService(Context.USAGE_STATS_SERVICE);
+        List<UsageStats> usageStats = mUsageStatsManager.queryUsageStats(UsageStatsManager.INTERVAL_DAILY, ts - 10000, ts);
 
         if (usageStats == null || usageStats.size() == 0) {
             return "NONE_PKG";
